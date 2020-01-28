@@ -8,6 +8,7 @@ const keys = require('./config/keys');
 require('./models/User');
 require('./models/Blog');
 require('./services/passport');
+require('./services/cache');
 require('dotenv').config({ path: __dirname + '/.env' });
 
 mongoose.Promise = global.Promise;
