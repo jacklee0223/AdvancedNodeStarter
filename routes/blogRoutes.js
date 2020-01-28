@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
 const requireLogin = require('../middlewares/requireLogin');
+const redis = require('redis');
+const util = require('util');
 
 const Blog = mongoose.model('Blog');
+
+const redisUrl = process.env['REDIS_URL'];
+const client = redis.createClient(redisUrl);
 
 module.exports = app => {
   app.get('/api/blogs/:id', requireLogin, async (req, res) => {
@@ -14,6 +19,14 @@ module.exports = app => {
   });
 
   app.get('/api/blogs', requireLogin, async (req, res) => {
+    client.get = util.promisify(client.get);
+    // Do we have any cached data in redis related to this query
+    const cachedBlogs = client.get(req.user.id);
+
+    // If yes, then respond to the request right away and return
+
+    // If no, we need to respond to request and update our cache to store the data
+
     const blogs = await Blog.find({ _user: req.user.id });
 
     res.send(blogs);
